@@ -75,12 +75,17 @@ class Controller {
 	 */
 	function handleRequest (&$request, &$context) {
 
-		// cycle through our process callback queue
-		foreach (array_keys ($this->_processCallbacks) as $proc) {
+		/* cycle through our process callback queue.  using each() vs.
+		 * foreach, etc. so we may add elements to the callback array
+		 * later.  probably primarily used for conditional callbacks. */
+		reset ($this->_processCallbacks);
+		while ($c = each ($this->_processCallbacks)) {
 
-			if ($this->_processProcess ($this->_processCallbacks[$proc]))
+			// test for a successful view dispatch
+			if ($this->_processProcess ($this->_processCallbacks[$c['key']],
+			                            $request,
+			                            $context))
 				return;
-
 		}
 
 		// if no view has been found yet attempt our default
@@ -138,7 +143,7 @@ class Controller {
 	 * @param ProcessCallback
 	 * @access protected
 	 */
-	function _processProcess (&$processCallback) {
+	function _processProcess (&$processCallback, &$request, &$context) {
 
 		// dispatch to and retrieve view from process callback
 		$view =& $processCallback->callBack ($this, $request, $context);
@@ -219,7 +224,9 @@ class ObjectProcessCallback extends ProcessCallback {
 
 		// hack to call object directly
 		$method_name = $this->_method;
-		return $this->_object->$method_name ($controller, $request, $context);
+		return $this->_object->$method_name ($controller,
+		                                     $request,
+		                                     $context);
 
 	}
 }
