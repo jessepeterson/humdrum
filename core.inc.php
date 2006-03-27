@@ -35,6 +35,9 @@ class Controller {
 	 */
 	var $_processCallbacks = array ();
 
+	function Controller () {
+	}
+
 	/**
 	 * Add view to view list keyed by name.
 	 *
@@ -73,19 +76,11 @@ class Controller {
 	function handleRequest (&$request, &$context) {
 
 		// cycle through our process callback queue
-		foreach (array_keys ($this->_processCallbacks) as $proc_key) {
+		foreach (array_keys ($this->_processCallbacks) as $proc) {
 
-			// dispatch to and retrieve view from process callback
-			$view =& $this->_processCallbacks[$proc_key]->callBack ($this, $request, $context);
-
-			if ($this->viewExists ($view)) {
-
-				/* dispatch to our named view and stop execution of this
-				   controller */
-				$this->renderView ($view, $request, $context);
+			if ($this->_processProcess ($this->_processCallbacks[$proc]))
 				return;
 
-			}
 		}
 
 		// if no view has been found yet attempt our default
@@ -135,6 +130,27 @@ class Controller {
 	 */
 	function renderDefaultView (&$request, &$context) {
 		$this->_defaultView->display ($this, $request, $context);
+	}
+
+	/**
+	 * Callback to process and dispatch to view.
+	 *
+	 * @param ProcessCallback
+	 * @access protected
+	 */
+	function _processProcess (&$processCallback) {
+
+		// dispatch to and retrieve view from process callback
+		$view =& $processCallback->callBack ($this, $request, $context);
+
+		if ($this->viewExists ($view)) {
+
+			/* dispatch to our named view and stop execution of this
+			   controller */
+			$this->renderView ($view, $request, $context);
+			return true;
+
+		}
 	}
 }
 
@@ -216,6 +232,9 @@ class ObjectProcessCallback extends ProcessCallback {
  * @package HUMDRUM_CORE
  */
 class View {
+	function View () {
+	}
+
 	/**
 	 * Render or display output of view.
 	 *
@@ -271,6 +290,8 @@ class ForwardView extends View {
  * @package HUMDRUM_CORE
  */
 class Request {
+	function Request () {
+	}
 }
 
 /**
@@ -283,6 +304,8 @@ class Request {
  * @package HUMDRUM_CORE
  */
 class Model {
+	function Model () {
+	}
 }
 
 ?>
