@@ -250,7 +250,7 @@ class View {
 	 * @param Request Controller request parameters.
 	 * @param Model Domain/business logic container.
 	 */
-	function render (&$source, &$request, &$context) {
+	function display (&$source, &$request, &$context) {
 	}
 }
 
@@ -282,9 +282,9 @@ class ForwardView extends View {
 	/**
 	 * Forward to instantiation-specified controller.
 	 *
-	 * @see View::render
+	 * @see View::display
 	 */
-	function render (&$source, &$request, &$context) {
+	function display (&$source, &$request, &$context) {
 		$this->_controller->handleRequest ($request, $context);
 	}
 }
